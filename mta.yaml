@@ -1,0 +1,43 @@
+## Generated mta.yaml based on template version 0.4.0
+## appName = cap_lsh
+## language=nodejs; multiTenant=false
+## approuter=
+_schema-version: '3.1'
+ID: cap_lsh1
+version: 1.0.0
+description: "A simple CAP project."
+parameters:
+  enable-parallel-deployments: true
+   
+build-parameters:
+  before-all:
+   - builder: custom
+     commands:
+      - npm install --production
+      - npx -p @sap/cds-dk cds build --production
+
+modules:
+ # --------------------- SERVER MODULE ------------------------
+ - name: cap_lsh1-srv
+ # ------------------------------------------------------------
+   type: nodejs
+   path: gen/srv
+   properties:
+     EXIT: 1  # required by deploy.js task to terminate 
+   requires:
+     - name: shyames5-destination
+     - name: shyam1-uaa
+
+
+resources:
+ - name: shyames5-destination
+   type: org.cloudfoundry.existing-service
+   parameters:
+     service-name: shyames5-destination
+
+ - name: shyam1-uaa
+   type: org.cloudfoundry.managed-service
+   parameters:
+     path: ./xs-security.json
+     service: xsuaa
+     service-plan: application  
